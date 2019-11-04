@@ -9,7 +9,7 @@
 """
 Demo script showing detections in sample images.
 
-See README.md for installation instructions before running.
+See ORIGIN_README.md for installation instructions before running.
 """
 from __future__ import absolute_import
 from __future__ import division
