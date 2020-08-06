@@ -1,3 +1,15 @@
+# Get predicted bbox and features for Human-Object Interactions
+```
+# 1. get bbox
+# set the `im_in_out_json,saved_model_path` in scripts/extract_boxes_scores.sh
+sh experiments/scripts/extract_boxes_scores.sh 
+
+# 2. get human,object and union bbox features
+# set the `saved_model_path, subset,type, file_dir,image_path` in scripts/get_fc7_hico.sh and get_fc7_vcoco.sh
+sh experiments/scripts/get_fc7_vcoco.sh
+sh experiments/scripts/get_fc7_hico.sh
+```
+
 # Important notice:
 If you used the master branch before Sep. 26 2017 and its corresponding pretrained model, **PLEASE PAY ATTENTION**:
 The old master branch in now under old_master, you can still run the code and download the pretrained model, but the pretrained model for that old master is not compatible to the current master!

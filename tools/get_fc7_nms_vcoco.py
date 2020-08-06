@@ -13,11 +13,10 @@ See README.md for installation instructions before running.
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-import sys
 
-sys.path.insert(0, "/home/xian/anaconda3/envs/faster-pt/lib/python3.6/site-packages")
 import _init_paths
 import h5py
+import argparse
 
 from model.nms_wrapper import nms
 from model.test import _get_blobs
@@ -177,17 +176,32 @@ def im_detect(net, im, person_boxes):
     return fc7_U, keep, all_map
 
 
-# CUDA_VISIBLE_DEVICES=3 python tools/get_p_o_fc7_nms_vcoco.py
+def parse_args():
+    """Parse input arguments."""
+    parser = argparse.ArgumentParser(description='Extract features')
+    parser.add_argument('--saved_model_path')
+    parser.add_argument('--subset')
+    parser.add_argument('--type')
+    parser.add_argument('--file_dir')
+    parser.add_argument('--image_path')
+    args = parser.parse_args()
+    return args
+
+
 if __name__ == '__main__':
-
-    saved_model_path = "/home/xian/Documents/code/pytorch-faster-rcnn-0.4/pth/" \
-                       "res50_faster_rcnn_iter_1190000.pth"
-
+    args = parse_args()
+    saved_model_path = args.saved_model_path
+    subset = args.subset
+    type = args.type
+    file_path = os.path.join(args.file_path, f'hoi_candidates_{subset}.hdf5')
+    write_file_path = os.path.join(args.file_path, f'hoi_candidates_{type}_feats_{subset}.hdf5')
+    ###########################################################################
     assert_err = 'Saved model file not found'
     assert (os.path.isfile(saved_model_path)), assert_err
 
+    num = 152 if "152" in saved_model_path else 50
     # Load network
-    net = resnetv1(num_layers=50)
+    net = resnetv1(num_layers=152)
     net.create_architecture(
         81,
         tag='default',
@@ -196,14 +210,6 @@ if __name__ == '__main__':
     print("loaded")
     net.eval()
     net.cuda()
-
-    subset = "test"
-    type = "human"
-    file_path = f'/home/xian/Documents/code/vcoco_no_frills/data_symlinks/' \
-                f'50/hoi_candidates_{subset}.hdf5'
-
-    write_file_path = f'/home/xian/Documents/code/vcoco_no_frills/data_symlinks/' \
-                      f'50/hoi_candidates_{type}_feats_{subset}.hdf5'
 
     file = h5py.File(file_path, "r")
     print(len(file))
@@ -220,9 +226,9 @@ if __name__ == '__main__':
         id = str(global_id).split("_")[1]
 
         if dataset == "test":
-            image_path = "/home/xian/Documents/data/coco/images/val2014/COCO_val2014_" + str(id).zfill(12) + ".jpg"
+            image_path = args.image_path + "val2014/COCO_val2014_" + str(id).zfill(12) + ".jpg"
         else:
-            image_path = "/home/xian/Documents/data/coco/images/train2014/COCO_train2014_" + str(id).zfill(12) + ".jpg"
+            image_path = args.image_path + "train2014/COCO_train2014_" + str(id).zfill(12) + ".jpg"
         im = cv2.imread(image_path)
         assert os.path.exists(image_path)
 
